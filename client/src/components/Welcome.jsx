@@ -21,7 +21,7 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 );
 
 const Welcome = () => {
-  const { currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading } = useContext(TransactionContext);
+  const {currentBalance, currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading } = useContext(TransactionContext);
 
   const handleSubmit = (e) => {
     const { addressTo, amount, keyword, message } = formData;
@@ -79,17 +79,23 @@ const Welcome = () => {
             <div className="flex justify-between flex-col w-full h-full">
               <div className="flex justify-between items-start">
                 <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
-                  <SiEthereum fontSize={21} color="#fff" />
-                </div>
+                  <SiEthereum fontSize={21} color="#fff" /> 
+                </div> 
                 <BsInfoCircle fontSize={17} color="#fff" />
               </div>
               <div>
+             
                 <p className="text-white font-light text-sm">
-                  {currentAccount?shortenAddress(currentAccount):""}
+                  {currentAccount?shortenAddress(currentAccount):""}  
                 </p>
-                <p className="text-white font-semibold text-lg mt-1">
-                  Ethereum
-                </p>
+                <div className="flex justify-between items-start">
+                  <p className="text-white font-semibold text-lg mt-1">
+                    Ethereum
+                  </p>
+                  <p className="text-white font-light text-sm">
+              {currentBalance?currentBalance +" ETH":""} 
+              </p>
+                </div>
               </div>
             </div>
           </div>

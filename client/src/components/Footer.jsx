@@ -1,8 +1,11 @@
 import React from "react";
 
 import logo from "../../images/logo.png";
+import { TransactionContext } from "../context/TransactionContext";
+const Footer = () =>{
+  const {transactionCount } = React.useContext(TransactionContext);
 
-const Footer = () => (
+  return  (
   <div className="w-full flex md:justify-center justify-between items-center flex-col p-4 gradient-bg-footer">
     {/* <div className="w-full flex sm:flex-row flex-col justify-between items-center my-4">
       <div className="flex flex-[0.5] justify-center items-center">
@@ -15,8 +18,11 @@ const Footer = () => (
         <p className="text-white text-base text-center mx-2 cursor-pointer">Wallets</p>
       </div>
     </div> */}
+    
 
     <div className="flex justify-center items-center flex-col mt-5">
+    <p className="text-white text-lg text-center">{transactionCount} transactions made</p>
+    <br></br>
       <p className="text-white text-sm text-center">Come join us and hear for the unexpected miracle</p>
       <p className="text-white text-sm text-center font-medium mt-2">info@leos.com</p>
     </div>
@@ -28,6 +34,7 @@ const Footer = () => (
       <p className="text-white text-right text-xs">All rights reserved</p>
     </div>
   </div>
-);
+)
+  };
 
 export default Footer;

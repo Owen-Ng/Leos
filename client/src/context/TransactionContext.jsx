@@ -28,10 +28,23 @@ export const TransactionProvider = ({children}) =>{
     const [isLoading, setIsLoading] = useState(false);
     const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'));
     const [transactions, setTransactions] = useState([]);
+    const [currentBalance, setCurrentBalance] = useState(undefined);
     const handleChange = (e, name) =>{
         setFormData((prevState) => ({...prevState, [name]: e.target.value}));
     }
-
+    const getEthBalance = async (address) =>{
+        try{
+            console.log(address);
+            if (address){
+                const provider =  new ethers.providers.Web3Provider(ethereum); 
+                const balance = await provider.getBalance(address);  
+                return ethers.utils.formatEther(balance);
+            }
+            
+        }catch(e){
+            console.log("Balance issues : " + e);
+        } 
+    }
     const getAllTransactions = async () =>{
         try {
             if (!ethereum) return alert("Please install metamask");
@@ -47,7 +60,7 @@ export const TransactionProvider = ({children}) =>{
                 amount: parseInt(transaction.amount._hex) / (10 ** 18)
 
             }));
-            setTransactions(structuredTransactions);
+            setTransactions(structuredTransactions); 
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object");
@@ -63,11 +76,14 @@ export const TransactionProvider = ({children}) =>{
             if(accounts.length){
                 setCurrentAccount(accounts[0]);
                 
-                getAllTransactions();
+                getAllTransactions(); 
+                const balance = await getEthBalance(accounts[0]);
+                setCurrentBalance(balance);
             }else{
                 console.log('No accounts Found');
-            }
+            } 
             console.log(accounts);
+            console.log(currentBalance);
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object");
@@ -88,7 +104,10 @@ export const TransactionProvider = ({children}) =>{
         try {
             if (!ethereum) return alert("Please install metamask");
             const accounts = await ethereum.request({method : 'eth_requestAccounts'});
-            setCurrentAccount(accounts[0]);
+            setCurrentAccount(accounts[0]); 
+            getAllTransactions(); 
+            const balance = await getEthBalance(accounts[0]);
+            setCurrentBalance(balance);
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object")
@@ -118,9 +137,13 @@ export const TransactionProvider = ({children}) =>{
             setIsLoading(false);
             console.log(`Success - ${transactionHash.hash}`);
 
-            const transactionCount  = await transactionContract.getTransactionCount();
-            setTransactionCount(transactionCount.toNumber());
-
+            // const transactionCount  = await transactionContract.getTransactionCount();
+            // transactionCount.wait();
+            // setTransactionCount(transactionCount.toNumber());
+            // getAllTransactions(); 
+            // const balance = await getEthBalance(currentAccount);
+            //  setCurrentBalance(balance ); 
+            window.location.reload();
         }catch(error){
             console.log(error);
             throw new Error("No ethereum object")
@@ -130,10 +153,14 @@ export const TransactionProvider = ({children}) =>{
 
     useEffect(() => {
         checkIfWalletIsConnected();
-        checkIfTransactionExist();
-    }, [] )
+        checkIfTransactionExist(); 
+    }, [])
+
+   
+    
+ 
     return (
-        <TransactionContext.Provider value = {{connectWallet, currentAccount,formData, setFormData, handleChange, sendTransaction, transactions, isLoading}}>
+        <TransactionContext.Provider value = {{transactionCount, currentBalance, connectWallet, currentAccount,formData, setFormData, handleChange, sendTransaction, transactions, isLoading}}>
             {children}
         </TransactionContext.Provider>
     )
