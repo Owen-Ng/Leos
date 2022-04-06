@@ -21,7 +21,8 @@ const Footer = () =>{
     
 
     <div className="flex justify-center items-center flex-col mt-5">
-    <p className="text-white text-lg text-center">{transactionCount} transactions made</p>
+    {transactionCount === 0 ? "": <p className="text-white text-lg text-center"> {transactionCount + " transactions made"}  </p> }
+    
     <br></br>
       <p className="text-white text-sm text-center">Come join us and hear for the unexpected miracle</p>
       <p className="text-white text-sm text-center font-medium mt-2">info@leos.com</p>

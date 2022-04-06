@@ -26,7 +26,7 @@ export const TransactionProvider = ({children}) =>{
     const [currentAccount, setCurrentAccount] = React.useState();
     const [formData, setFormData] = useState({addressTo: '', amount: '', keyword: '', message:''});
     const [isLoading, setIsLoading] = useState(false);
-    const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'));
+    const [transactionCount, setTransactionCount] = useState(0);
     const [transactions, setTransactions] = useState([]);
     const [currentBalance, setCurrentBalance] = useState(undefined);
     const handleChange = (e, name) =>{
@@ -94,7 +94,7 @@ export const TransactionProvider = ({children}) =>{
         try {
             const transactionContract = getEtheureumContract();
             const transactionCount = await transactionContract.getTransactionCount();
-            window.localStorage.setItem("transactionCount", transactionCount);
+            setTransactionCount(transactionCount.toNumber());
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object");
@@ -105,9 +105,13 @@ export const TransactionProvider = ({children}) =>{
             if (!ethereum) return alert("Please install metamask");
             const accounts = await ethereum.request({method : 'eth_requestAccounts'});
             setCurrentAccount(accounts[0]); 
+            const transactionContract = getEtheureumContract();
+            const transactionCount = await transactionContract.getTransactionCount();
+            setTransactionCount(transactionCount.toNumber()); 
             getAllTransactions(); 
             const balance = await getEthBalance(accounts[0]);
             setCurrentBalance(balance);
+            
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object")
@@ -135,15 +139,12 @@ export const TransactionProvider = ({children}) =>{
             console.log(`Loading - ${transactionHash.hash}`);
             await transactionHash.wait();
             setIsLoading(false);
-            console.log(`Success - ${transactionHash.hash}`);
-
-            // const transactionCount  = await transactionContract.getTransactionCount();
-            // transactionCount.wait();
-            // setTransactionCount(transactionCount.toNumber());
-            // getAllTransactions(); 
-            // const balance = await getEthBalance(currentAccount);
-            //  setCurrentBalance(balance ); 
-            window.location.reload();
+            console.log(`Success - ${transactionHash.hash}`);  
+            const transactionCount  = await transactionContract.getTransactionCount();  
+            setTransactionCount(transactionCount.toNumber());
+            getAllTransactions(); 
+            const balance = await getEthBalance(currentAccount);
+            setCurrentBalance(balance );  
         }catch(error){
             console.log(error);
             throw new Error("No ethereum object")
@@ -154,10 +155,9 @@ export const TransactionProvider = ({children}) =>{
     useEffect(() => {
         checkIfWalletIsConnected();
         checkIfTransactionExist(); 
-    }, [])
+       
+}, [])
 
-   
-    
  
     return (
         <TransactionContext.Provider value = {{transactionCount, currentBalance, connectWallet, currentAccount,formData, setFormData, handleChange, sendTransaction, transactions, isLoading}}>
